@@ -68,27 +68,6 @@ def create_image():
 
     return image
 
-def status(icon, item):
-    Thread(target=status_now, daemon=True).start()
-
-def status_now():
-    root = tk.Tk()
-    root.title("Spotify Volume Controller")
-    pythoncom.CoInitialize()
-    sessions = AudioUtilities.GetAllSessions()
-    for session in sessions:
-        if session.Process and session.Process.name() == "Spotify.exe":
-            label = tk.Label(root, text="Spotify found!")
-        else: 
-            label = tk.Label(root, text="Spotify not found!")
-    label.pack(padx=20, pady=20)
-    root.mainloop()
-    notification.notify(
-        title='Notice!',
-        message='Program was hidden in tray',
-        app_name='Spotify Volume Controller'
-    )
-
 def quit_app(icon, item):
     icon.stop()
 
@@ -96,7 +75,6 @@ listener = pynput.keyboard.Listener(on_release=on_release)
 listener.start()
 
 menu = Menu(
-    MenuItem('Status', status),
     MenuItem('Quit', quit_app)
 )
 
