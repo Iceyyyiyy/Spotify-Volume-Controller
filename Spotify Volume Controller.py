@@ -6,8 +6,20 @@ from pystray import Icon, Menu, MenuItem
 from PIL import Image, ImageDraw
 
 mute = True
-oldVol = 0
 active = True
+
+
+def init():
+    global oldVol
+    oldVol = 0
+    pythoncom.CoInitialize()
+    sessions = AudioUtilities.GetAllSessions()
+    for session in sessions:
+        volume = session._ctl.QueryInterface(ISimpleAudioVolume)
+        if session.Process and session.Process.name() == "Spotify.exe":
+            oldVol = volume.GetMasterVolume()
+            
+init()
 
 def vol_down():
     pythoncom.CoInitialize()
@@ -18,10 +30,13 @@ def vol_down():
             print("Current Volume: " + str(volume.GetMasterVolume()))
             vol = volume.GetMasterVolume() - 0.05
             print(f"New Volume: {vol}")
+            global oldVol
             if not vol <= 0.0:
                 volume.SetMasterVolume(vol, None)
+                oldVol = volume.GetMasterVolume()
             elif vol <= 0.0:
                 volume.SetMasterVolume(0.0, None)
+                oldVol = volume.GetMasterVolume()
             else:
                 print("Volume out of bounds")
 
@@ -34,10 +49,13 @@ def vol_up():
             print("Current Volume: " + str(volume.GetMasterVolume()))
             vol = volume.GetMasterVolume() + 0.05
             print(f"New Volume: {vol}")
+            global oldVol
             if not vol >= 1.0:
                 volume.SetMasterVolume(vol, None)
+                oldVol = volume.GetMasterVolume()
             elif vol >= 1.0:
                 volume.SetMasterVolume(1.0, None)
+                oldVol = volume.GetMasterVolume()
             else:
                 print("Volume out of bounds")
 
@@ -48,9 +66,7 @@ def vol_mute():
         volume = session._ctl.QueryInterface(ISimpleAudioVolume)
         if session.Process and session.Process.name() == "Spotify.exe":
             global mute
-            if mute:
-                global oldVol
-                oldVol = volume.GetMasterVolume()
+            if volume.GetMasterVolume() > 0.0:
                 print(oldVol)
                 volume.SetMasterVolume(0.0, None)
                 mute = False
