@@ -39,15 +39,6 @@ def vol_up():
             else:
                 print("Volume out of bounds")
 
-def on_release(key):
-    key_str = str(key)
-    if '<141>' in key_str:
-        thread = Thread(target=vol_down)
-        thread.start()
-    if '<140>' in key_str:
-        thread = Thread(target=vol_up)
-        thread.start()
-
 def create_image():
     width = 64
     height = 64
@@ -71,7 +62,18 @@ def create_image():
 def quit_app(icon, item):
     icon.stop()
 
-listener = pynput.keyboard.Listener(on_release=on_release)
+def win32_event_filter(msg, data):
+    if msg == 0x0100:
+        if data.vkCode == 0xAF:
+            thread = Thread(target=vol_up)
+            thread.start()
+            listener.suppress_event()
+        elif data.vkCode == 0xAE:
+            thread = Thread(target=vol_down)
+            thread.start()
+            listener.suppress_event()
+
+listener = pynput.keyboard.Listener(win32_event_filter=win32_event_filter)
 listener.start()
 
 menu = Menu(
@@ -82,6 +84,4 @@ icon = Icon("Spotify Volume Controller", create_image(), "Spotify Volume Control
 icon.run()
 
 listener.stop()
-
-
 

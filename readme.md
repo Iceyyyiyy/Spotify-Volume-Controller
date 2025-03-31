@@ -1,13 +1,5 @@
 ### Spotify Volume Controller
 
-A little Python script to controll the Spotify volume using Virtual Keys.
+A little Python script to controll the Spotify volume
 
-Volume up: VK140
-
-Volume down: VK141
-
-Use PowerToys to rebind Keyboard Keys
-
-# Notice!
-
-This script will not change Spotifys own volume but its Windows volume.
+This script will not change Spotifys own volume but its Windows application volume.
